@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disease Detection App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; }
+        form { margin-bottom: 30px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        select, input[type="file"], input[type="text"], button {
+            width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;
+        }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; }
+        .doctors, .cure { margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Disease Detection App</h1>
+
+    <!-- Upload Form -->
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <label for="input_type">Select Input Type:</label>
+        <select name="input_type" id="input_type">
+            <option value="xray" {% if input_type=='xray' %}selected{% endif %}>Chest X-ray</option>
+            <option value="heart" {% if input_type=='heart' %}selected{% endif %}>Heart X-ray</option>
+            <option value="symptoms" {% if input_type=='symptoms' %}selected{% endif %}>Symptoms</option>
+        </select>
+
+        <div id="file_upload">
+            <label for="file">Upload Image:</label>
+            <input type="file" name="file" id="file">
+        </div>
+
+        <div id="symptom_input" style="display:none;">
+            <label for="symptoms">Enter Symptoms (comma-separated):</label>
+            <input type="text" name="symptoms" id="symptoms" placeholder="e.g. cough, fever, chest pain">
+        </div>
+
+        <label for="location">Select Location:</label>
+        <select name="location" id="location">
+            {% for loc in locations %}
+                <option value="{{loc}}" {% if selected_location==loc %}selected{% endif %}>{{loc}}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <!-- Display Result -->
+    {% if result %}
+    <div class="result">
+        <h2>Prediction: {{ result }}</h2>
+
+        {% if cure %}
+        <div class="cure">
+            <h3>Suggested Cure / Advice:</h3>
+            <ul>
+                {% for c in cure %}
+                    <li>{{c}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if doctors %}
+        <div class="doctors">
+            <h3>Doctors in {{ selected_location }}:</h3>
+            <ul>
+                {% for d in doctors %}
+                    <li>{{ d.name }} - {{ d.hospital }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+            <p>No doctor suggestions available for this disease in the selected location.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Toggle input fields based on dropdown
+    const inputType = document.getElementById("input_type");
+    const fileUpload = document.getElementById("file_upload");
+    const symptomInput = document.getElementById("symptom_input");
+
+    function toggleInputs() {
+        if (inputType.value === "symptoms") {
+            fileUpload.style.display = "none";
+            symptomInput.style.display = "block";
+        } else {
+            fileUpload.style.display = "block";
+            symptomInput.style.display = "none";
+        }
+    }
+
+    inputType.addEventListener("change", toggleInputs);
+    window.onload = toggleInputs;
+</script>
+</body>
+</html>

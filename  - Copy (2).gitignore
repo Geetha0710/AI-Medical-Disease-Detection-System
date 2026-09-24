@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+venv/
+.env
+uploads/
+data/
+models/
+*.pkl
+*.h5
+
+# ignore temporary/text/debug files
+*.txt
+*.md
